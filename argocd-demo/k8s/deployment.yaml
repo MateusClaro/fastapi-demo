@@ -1,5 +1,5 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: fastapi-demo
   namespace: default
@@ -8,11 +8,6 @@ spec:
   selector:
     matchLabels:
       app: fastapi-demo
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
   template:
     metadata:
       labels:
@@ -20,7 +15,7 @@ spec:
     spec:
       containers:
         - name: fastapi-demo
-          image: fastapi-demo:v3
+          image: fastapi-demo:v4
           ports:
             - containerPort: 8000
           readinessProbe:
@@ -35,3 +30,11 @@ spec:
               port: 8000
             initialDelaySeconds: 10
             periodSeconds: 10
+  strategy:
+    canary:
+      steps:
+        - setWeight: 25    # 1 pod v2 (25%)
+        - pause: {}        # pausa — aguarda aprovação manual
+        - setWeight: 50    # 2 pods v2
+        - pause: {}        # pausa novamente
+        - setWeight: 100   # todos os pods v2
