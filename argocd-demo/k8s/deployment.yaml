@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: fastapi-demo
-          image: fastapi-demo:v5
+          image: fastapi-demo:v6
           ports:
             - containerPort: 8000
           readinessProbe:
